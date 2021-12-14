@@ -1,0 +1,47 @@
+- name: reset kubernetes component
+  shell: "kubeadm reset --force --cri-socket=/var/run/{{ container_runtime }}/{{ container_runtime }}.sock"
+  become: yes
+  register: reset_cluster
+
+- name: init kubernetes cluster
+  when: reset_cluster is succeeded
+  shell: |
+    kubeadm init --service-cidr {{ service_cidr }} \
+                --kubernetes-version {{ kube_version }} \
+                --pod-network-cidr {{ pod_network_cidr }} \
+                --apiserver-advertise-address {{ control_plane_ip }} \
+                --cri-socket /var/run/{{ container_runtime }}/{{ container_runtime }}.sock \
+                {{ kubeadm_opts }} \
+                {{ init_opts }}
+  become: yes
+  register: init_cluster
+
+- name: create user .kube directory
+  file:
+    path: ".kube/"
+    state: directory
+    mode: 0755
+
+- name: copy admin.conf to user home directory
+  copy:
+    src: "/etc/kubernetes/admin.conf"
+    dest: ".kube/config"
+    owner: "{{ ansible_user | default(ansible_user_id) }}"
+    group: "{{ ansible_user | default(ansible_user_id) }}"
+    mode: 0755
+    remote_src: yes
+  become: yes
+
+- name: install pod network
+  shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
+    
+- name: get the token for joining the worker nodes
+  shell: kubeadm token create --print-join-command
+  register: kubernetes_join_command
+
+- name: print join command
+  debug:
+    msg: "{{ kubernetes_join_command.stdout }}"
+
+- name: copy join command to local file
+  local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/tmp/kubernetes_join_command" mode=0777

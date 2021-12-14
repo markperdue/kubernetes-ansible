@@ -1,0 +1,9 @@
+kube_version: "1.23.0"
+container_runtime: containerd
+network: calico
+service_cidr: "10.96.0.0/12"
+pod_network_cidr: "10.244.0.0/16"
+control_plane_ip: "{{ hostvars[groups['control_planes'][0]]['ansible_default_ipv4'].address | default(groups['control_planes'][0]) }}"
+
+kubeadm_opts: ""
+init_opts: ""

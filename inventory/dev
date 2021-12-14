@@ -1,0 +1,7 @@
+[control_planes]
+cp1 ansible_host=192.168.2.21
+
+[nodes]
+node1 ansible_host=192.168.2.31
+node2 ansible_host=192.168.2.32
+node3 ansible_host=192.168.2.33

@@ -1,0 +1,86 @@
+- name: disable swap
+  shell: |
+    swapoff -a
+    sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+- name: modprobe
+  shell: |
+    modprobe overlay
+    modprobe br_netfilter
+
+- name: create containerd config file
+  file:
+    path: "/etc/modules-load.d/containerd.conf"
+    state: "touch"
+
+- name: add conf for containerd
+  blockinfile:
+    path: "/etc/modules-load.d/containerd.conf"
+    block: |
+      overlay
+      br_netfilter
+
+- name: set system configurations for Kubernetes networking
+  file:
+    path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+    state: "touch"
+
+- name: add conf for containerd
+  blockinfile:
+    path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+    block: |
+      net.bridge.bridge-nf-call-iptables  = 1
+      net.ipv4.ip_forward                 = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+
+- name: apply new settings
+  command: sysctl --system
+
+- name: install containerd
+  apt:
+    update_cache: yes
+    name: containerd
+
+- name: configure containerd
+  shell: |
+    mkdir -p /etc/containerd
+    containerd config default | tee /etc/containerd/config.toml
+    sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+    systemctl restart containerd
+
+- name: add google apt gpg key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: add kubernetes apt repository
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: 'kubernetes'
+
+- name: install kubernetes
+  apt:
+    update_cache: yes
+    pkg:
+      - kubelet={{ kube_version + '-00' }}
+      - kubeadm={{ kube_version + '-00' }}
+      - kubectl={{ kube_version + '-00' }}
+
+- name: exclude kube components from apt upgrades
+  shell: |
+    apt-mark hold kubelet kubeadm kubectl containerd
+
+- name: enable containerd systemd service
+  systemd:
+    state: started
+    name: containerd.service
+    enabled: yes
+    daemon_reload: yes
+
+- name: enable kubelet systemd service
+  systemd:
+    state: started
+    name: kubelet.service
+    enabled: yes
+    daemon_reload: yes
