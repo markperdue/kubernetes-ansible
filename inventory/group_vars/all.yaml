@@ -1,4 +1,4 @@
-kube_version: "1.23.0"
+kube_version: "1.24.0"
 container_runtime: containerd
 network: calico
 service_cidr: "10.96.0.0/12"
