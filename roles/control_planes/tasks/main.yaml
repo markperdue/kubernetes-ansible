@@ -1,6 +1,6 @@
 - name: reset kubernetes component
   shell: "kubeadm reset --force --cri-socket=/var/run/{{ container_runtime }}/{{ container_runtime }}.sock"
-  become: yes
+  become: true
   register: reset_cluster
 
 - name: init kubernetes cluster
@@ -13,7 +13,7 @@
                 --cri-socket /var/run/{{ container_runtime }}/{{ container_runtime }}.sock \
                 {{ kubeadm_opts }} \
                 {{ init_opts }}
-  become: yes
+  become: true
   register: init_cluster
 
 - name: create user .kube directory
@@ -27,21 +27,27 @@
     src: "/etc/kubernetes/admin.conf"
     dest: ".kube/config"
     owner: "{{ ansible_user | default(ansible_user_id) }}"
-    group: "{{ ansible_user | default(ansible_user_id) }}"
+    group: "{{ group | default(ansible_user_id) }}"
     mode: 0755
     remote_src: yes
-  become: yes
+  become: true
 
 - name: install pod network
   shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
-    
+
 - name: get the token for joining the worker nodes
   shell: kubeadm token create --print-join-command
   register: kubernetes_join_command
 
-- name: print join command
-  debug:
-    msg: "{{ kubernetes_join_command.stdout }}"
+- set_fact:
+    node_join_command: "{{ kubernetes_join_command.stdout }}"
 
-- name: copy join command to local file
-  local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/tmp/kubernetes_join_command" mode=0777
+- name: Add k alias for user
+  lineinfile:
+    path=/home/{{ ansible_user }}/.bashrc
+    line="alias k='kubectl'"
+    owner={{ ansible_user }}
+    regexp='^alias k='kubectl'$'
+    state=present
+    insertafter=EOF
+    create=True

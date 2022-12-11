@@ -1,4 +1,4 @@
-kube_version: "1.24.3"
+kube_version: "1.25.4"
 container_runtime: containerd
 network: calico
 service_cidr: "10.96.0.0/12"
@@ -7,3 +7,5 @@ control_plane_ip: "{{ hostvars[groups['control_planes'][0]]['ansible_default_ipv
 
 kubeadm_opts: ""
 init_opts: ""
+
+group: "appowner"

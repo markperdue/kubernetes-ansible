@@ -6,10 +6,6 @@
 - set_fact:
     kubeadm_join: "{{ kubeadm_join_cmd.stdout }}"
 
-- name: print join command
-  debug:
-    msg: "{{ kubeadm_join }}"
-
 - name: join worker node to cluster
   shell: "{{ kubeadm_join }}"
-  become: yes
+  become: true
