@@ -26,8 +26,8 @@ I will update this guide to support Kubernetes v1.26.0 which was released recent
 
 # Guide
 1. [Get companion code](#get-companion-code)
-1. [Prep for Ansible](#prep-for-ansible)
 1. [The Ansible Playbook](#the-ansible-playbook)
+1. [Prep for Ansible](#prep-for-ansible)
 1. [Install Kubernetes](#install-kubernetes)
 1. [Verify Kubernetes](#verify-kubernetes)
 1. [Wrap Up](#wrap-up)
@@ -35,17 +35,6 @@ I will update this guide to support Kubernetes v1.26.0 which was released recent
 
 # Get companion code
 The code this guide uses is available at [https://github.com/markperdue/kubernetes-ansible](https://github.com/markperdue/kubernetes-ansible). Clone the companion code repo to have the best experience following along.
-
-
-# Prep for Ansible
-Ansible will be sshing into our nodes so we need to establish some trust between where ansible will be running and the nodes. We can use `ssh-keyscan` to gather the public ssh host keys of our hosts and append them to our `known_hosts` file
-
-```
-ssh-keyscan -H -t rsa c1-cp1.lab >> ~/.ssh/known_hosts
-ssh-keyscan -H -t rsa c1-node1.lab >> ~/.ssh/known_hosts
-ssh-keyscan -H -t rsa c1-node2.lab >> ~/.ssh/known_hosts
-ssh-keyscan -H -t rsa c1-node3.lab >> ~/.ssh/known_hosts
-```
 
 
 # The Ansible Playbook
@@ -68,7 +57,7 @@ init_opts: ""
 
 This playbook is setup to separate things by the type of Kubernetes node to better scale our the cluster as needed. 
 
-In `playbooks/common.yaml` you will see what will run on every node regargless of the node type - a role called `roles/common`
+In `playbooks/common.yaml` you will see what will run on every node regardless of the node type - a role called `roles/common`
 ```
 - hosts: "control_planes, nodes"
   become: yes
@@ -81,6 +70,17 @@ That `roles/common` reference will lead to Ansible running all the tasks outline
 The `roles/control_planes` role will using `kubeadm init` to setup our cluster while also doing some maintenance tasks like creating a `.kube` user directory with the Kubernetes generated `admin.conf` file loaded in. This role also installs the Calico pod network by applying the yaml mainifest file from [https://docs.projectcalico.org/manifests/calico.yaml ](https://docs.projectcalico.org/manifests/calico.yaml).
 
 The entrypoint for the playbook is the file `playbooks/k8s_all.yaml` which consolidates all the things above into a single file.
+
+
+# Prep for Ansible
+Ansible will be sshing into our nodes so we need to establish some trust between where ansible will be running and the nodes. We can use `ssh-keyscan` to gather the public ssh host keys of our hosts and append them to our `known_hosts` file.
+
+```
+ssh-keyscan -H -t rsa c1-cp1.lab >> ~/.ssh/known_hosts
+ssh-keyscan -H -t rsa c1-node1.lab >> ~/.ssh/known_hosts
+ssh-keyscan -H -t rsa c1-node2.lab >> ~/.ssh/known_hosts
+ssh-keyscan -H -t rsa c1-node3.lab >> ~/.ssh/known_hosts
+```
 
 
 # Install Kubernetes
@@ -153,4 +153,6 @@ Let's take a look at our cluster by sshing into the control plane node `c1-cp1.l
     ```
 
 # Wrap Up
-And with that, we now have a Kubernetes cluster! In the final guide, we will install tools into the cluster like Jenkins and a Kubernetes dashboard using Ansible. This includes having Jenkins spin up with a built-in pipeline that will deploy a sample go app to our cluster and expose the service using a load balancing tool called [MetalLB](https://metallb.universe.tf/) amongst other things.
+And with that, we now have a Kubernetes cluster!
+
+In the final guide, we will install tools into the cluster like Jenkins and a Kubernetes dashboard using Ansible. This includes having Jenkins spin up with a built-in pipeline that will deploy a sample go app to our cluster and expose the service using a load balancing tool called [MetalLB](https://metallb.universe.tf/) amongst other things.
