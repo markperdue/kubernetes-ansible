@@ -1,7 +1,7 @@
 # Overview
 An Ansible playbook that installs Kubernetes.
 
-Integrates nicely as a secondary step to https://github.com/markperdue/vm-vsphere-cloud-init
+A guide for using this repo to spin up a Kubernetes cluster is available at [Installing your Kubernetes homelab cluster in minutes with Ansible](https://perdue.dev/installing-your-kubernetes-homelab-cluster-in-minutes-with-ansible/)
 
 
 # Features
@@ -17,6 +17,3 @@ ansible-playbook -i inventory/dev playbooks/k8s_all.yaml
 # reboot might be required after installation
 ansible -i inventory/dev all -a "/sbin/reboot" --become
 ```
-
-# TODO
-1. clean up kubeadm worker node onboarding section. right now we generate the token three times. one for each worker node

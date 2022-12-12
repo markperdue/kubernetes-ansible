@@ -35,13 +35,6 @@
 - name: install pod network
   shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
 
-- name: get the token for joining the worker nodes
-  shell: kubeadm token create --print-join-command
-  register: kubernetes_join_command
-
-- set_fact:
-    node_join_command: "{{ kubernetes_join_command.stdout }}"
-
 - name: Add k alias for user
   lineinfile:
     path=/home/{{ ansible_user }}/.bashrc
