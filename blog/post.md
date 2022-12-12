@@ -49,13 +49,26 @@ ssh-keyscan -H -t rsa c1-node3.lab >> ~/.ssh/known_hosts
 
 
 # The Ansible Playbook
-I have created an ansible playbook that will install and configure our Kubernetes cluster. This is what the companion code repo mentioned before is.
+I have provided an [ansible playbook](https://github.com/markperdue/kubernetes-ansible) that will install and configure our Kubernetes cluster. This is what the companion code repo mentioned before is.
 
 The main configuration file that can be edited as needed is the `inventory/group_vars/all.yaml` file. If you have been following along with the series from part 1, no settings need to be changed in that file.
+```
+# inventory/group_vars/all.yaml
+kube_version: "1.25.4"
+group: "appowner"
+container_runtime: containerd
+network: calico
+service_cidr: "10.96.0.0/12"
+pod_network_cidr: "10.244.0.0/16"
+control_plane_ip: "{{ hostvars[groups['control_planes'][0]]['ansible_default_ipv4'].address | default(groups['control_planes'][0]) }}"
+
+kubeadm_opts: ""
+init_opts: ""
+```
 
 This playbook is setup to separate things by the type of Kubernetes node to better scale our the cluster as needed. 
 
-In `playbooks/common.yaml` you will see what will run on every node regarless of the node type - a role called `roles/common`
+In `playbooks/common.yaml` you will see what will run on every node regargless of the node type - a role called `roles/common`
 ```
 - hosts: "control_planes, nodes"
   become: yes
