@@ -1,0 +1,4 @@
+- hosts: "control_planes, nodes"
+  become: yes
+  roles:
+    - role: 'roles/update-and-reboot'

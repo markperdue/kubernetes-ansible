@@ -19,9 +19,7 @@ To keep this series managable, I will skip over basics of why and how to use too
 This is a walkthrough that is meant to be adapted to your network design and hardware. It is best suited for those that have a single homelab machine where ESXi will be installed directly on the hardware and a vCenter instance will be started up within the ESXi host. Also, it should go without needing to say it, but this is not production grade - things like valid tls certificates are not included.
 
 # This guide
-By the end of this guide, you will have a 3 worker node Kubernetes v1.25.4 cluster using [containerd](https://containerd.io/) as our container runtime and [Calico](https://projectcalico.docs.tigera.io/about/about-calico) as our pod network. 
-
-I will update this guide to support Kubernetes v1.26.0 which was released recently once that option becomes available in Ubuntu. The latest version of containerd in Ubuntu is 1.5.9 which is [not supported](https://kubernetes.io/blog/2022/12/09/kubernetes-v1-26-release/#cri-v1alpha2-removed) by Kubernetes 1.26.0.
+By the end of this guide, you will have a 3 worker node Kubernetes v1.26.1 cluster using [containerd](https://containerd.io/) as our container runtime and [Calico](https://projectcalico.docs.tigera.io/about/about-calico) as our pod network.
 
 
 # Guide
@@ -43,7 +41,7 @@ I have provided an [ansible playbook](https://github.com/markperdue/kubernetes-a
 The main configuration file that can be edited as needed is the `inventory/group_vars/all.yaml` file. If you have been following along with the series from part 1, no settings need to be changed in that file.
 ```
 # inventory/group_vars/all.yaml
-kube_version: "1.25.4"
+kube_version: "1.26.1"
 group: "appowner"
 container_runtime: containerd
 network: calico
@@ -60,7 +58,7 @@ This playbook is setup to separate things by the type of Kubernetes node to bett
 In `playbooks/common.yaml` you will see what will run on every node regardless of the node type - a role called `roles/common`
 ```
 - hosts: "control_planes, nodes"
-  become: yes
+  become: true
   roles:
     - roles/common
 ```
@@ -99,37 +97,44 @@ Let's take a look at our cluster by sshing into the control plane node `c1-cp1.l
 1. Type `ssh appuser@c1-cp1.lab`
     ```
     $ ssh appuser@c1-cp1.lab
-    Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.15.0-56-generic x86_64)
+    Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.15.0-60-generic x86_64)
 
     * Documentation:  https://help.ubuntu.com
     * Management:     https://landscape.canonical.com
     * Support:        https://ubuntu.com/advantage
 
-    System information as of Sun Dec 11 15:44:14 PST 2022
+    System information as of Fri Feb 10 21:15:39 PST 2023
 
-    System load:  0.19873046875      Processes:               198
-    Usage of /:   21.4% of 19.20GB   Users logged in:         0
+    System load:  0.458984375        Processes:               201
+    Usage of /:   21.7% of 19.20GB   Users logged in:         0
     Memory usage: 25%                IPv4 address for ens192: 192.168.2.21
     Swap usage:   0%                 IPv4 address for tunl0:  10.244.13.192
 
-    * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
-    just raised the bar for easy, resilient and secure K8s cluster deployment.
 
-    https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+    * Introducing Expanded Security Maintenance for Applications.
+    Receive updates to over 25,000 software packages with your
+    Ubuntu Pro subscription. Free for personal use.
+
+        https://ubuntu.com/pro
+
+    Expanded Security Maintenance for Applications is not enabled.
 
     0 updates can be applied immediately.
 
+    Enable ESM Apps to receive additional future security updates.
+    See https://ubuntu.com/esm or run: sudo pro status
 
-    Last login: Sun Dec 11 15:41:30 2022 from 192.168.1.43
+
+    Last login: Fri Feb 10 21:15:15 2023 from 192.168.1.43
     ```
 1. Let's make sure our cluster consists of 4 nodes with a control-plane and 3 workers with `kubectl get nodes` or take advantage of one of the ansible tasks in the playbook that created an alias to `kubectl` called `k`
     ```
     $ k get nodes
     NAME       STATUS   ROLES           AGE     VERSION
-    c1-cp1     Ready    control-plane   4m47s   v1.25.4
-    c1-node1   Ready    <none>          4m16s   v1.25.4
-    c1-node2   Ready    <none>          4m16s   v1.25.4
-    c1-node3   Ready    <none>          4m16s   v1.25.4
+    c1-cp1     Ready    control-plane   114s   v1.26.1
+    c1-node1   Ready    <none>          82s    v1.26.1
+    c1-node2   Ready    <none>          82s    v1.26.1
+    c1-node3   Ready    <none>          82s    v1.26.1
     ```
 1. Check what pods are running in the cluster across all namespaces with `kubectl get pods -A`
     ```

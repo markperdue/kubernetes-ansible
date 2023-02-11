@@ -1,0 +1,13 @@
+- name: update all packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: reboot if requested by the system
+  shell: sleep 10 && /sbin/shutdown -r now 'rebooting as requested by the system' 
+  args:
+    removes: /var/run/reboot-required
+  async: 300
+  poll: 0
+  ignore_errors: true
+ 

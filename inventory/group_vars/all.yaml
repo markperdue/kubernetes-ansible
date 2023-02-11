@@ -1,4 +1,4 @@
-kube_version: "1.25.4"
+kube_version: "1.26.1"
 group: "appowner"
 container_runtime: containerd
 network: calico

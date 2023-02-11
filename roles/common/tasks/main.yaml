@@ -36,10 +36,31 @@
 - name: apply new settings
   command: sysctl --system
 
-- name: install containerd
+# - name: install containerd
+#   apt:
+#     update_cache: yes
+#     name: containerd
+
+# containerd.io >1.6
+- name: add docker apt gpg key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: get OS release name
+  command: "lsb_release -cs"
+  changed_when: false
+  register: lsb_rel
+
+- name: add docker apt repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ lsb_rel.stdout }} stable
+    state: present
+
+- name: install containerd >1.6 from docker repository
   apt:
     update_cache: yes
-    name: containerd
+    name: containerd.io
 
 - name: configure containerd
   shell: |

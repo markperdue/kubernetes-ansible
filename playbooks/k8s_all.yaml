@@ -1,3 +1,4 @@
 - import_playbook: common.yaml
 - import_playbook: control_planes.yaml
 - import_playbook: nodes.yaml
+- import_playbook: update-and-reboot.yaml
