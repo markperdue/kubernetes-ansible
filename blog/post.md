@@ -161,3 +161,5 @@ Let's take a look at our cluster by sshing into the control plane node `c1-cp1.l
 And with that, we now have a Kubernetes cluster!
 
 In the final guide, we will install tools into the cluster like Jenkins and a Kubernetes dashboard using Ansible. This includes having Jenkins spin up with a built-in pipeline that will deploy a sample go app to our cluster and expose the service using a load balancing tool called [MetalLB](https://metallb.universe.tf/) amongst other things.
+
+Continue on to part 4 - [Installing Kubernetes Homelab Tools for Development and Deploying a Sample Application Using a Jenkins Pipeline](https://perdue.dev/installing-kubernetes-homelab-tools-for-development-and-deploying-a-application-using-a-jenkins-pipeline/)
