@@ -7,7 +7,7 @@ This is part 3 of a multi-part series where we continue building off of the prev
 # The goal of this series
 This series is for you if you are interested in making management of your homelab something more turn-key. It is also for you if you are looking for something to help get hands-on experience to move from hobby tinkering to tools used in the workplace for managing infrastructure like Kubernetes clusters.
 
-The series is an end-to-end walkthrough from installing ESXi on bare metal up to having homelab tools (Jenkins, Kubernetes dashboard) running in a Kubernenetes cluster using infrastructure as code practices to allow you to spin up and manage this whole setup through terraform and ansible.
+The series is an end-to-end walkthrough from installing ESXi on bare metal up to having homelab tools (Jenkins, Kubernetes dashboard) running in a Kubernetes cluster using infrastructure as code practices to allow you to spin up and manage this whole setup through terraform and ansible.
 
 The end-state Kubernetes cluster we will be creating will have some developer-focused tools deployed which will be described in more detail in part 4. All tools are deployed from code.<br/>
 ![homelab_tools-1](https://perdue.dev/content/images/2022/12/homelab_tools-1.png)
