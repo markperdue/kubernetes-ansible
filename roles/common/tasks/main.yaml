@@ -69,14 +69,15 @@
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
     systemctl restart containerd
 
-- name: add google apt gpg key
+- name: add kubernetes apt gpg key
   apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    url: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
     state: present
+    keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 - name: add kubernetes apt repository
   apt_repository:
-    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /
     state: present
     filename: 'kubernetes'
 
@@ -84,9 +85,9 @@
   apt:
     update_cache: yes
     pkg:
-      - kubelet={{ kube_version + '-00' }}
-      - kubeadm={{ kube_version + '-00' }}
-      - kubectl={{ kube_version + '-00' }}
+      - kubelet={{ kube_version + '-1.1' }}
+      - kubeadm={{ kube_version + '-1.1' }}
+      - kubectl={{ kube_version + '-1.1' }}
 
 - name: exclude kube components from apt upgrades
   shell: |

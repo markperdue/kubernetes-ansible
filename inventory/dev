@@ -1,7 +1,7 @@
 [control_planes]
-cp1 ansible_host=c1-cp1.lab
+c1-cp1 ansible_host=192.168.1.81
 
 [nodes]
-node1 ansible_host=c1-node1.lab
-node2 ansible_host=c1-node2.lab
-node3 ansible_host=c1-node3.lab
+c1-node1 ansible_host=192.168.1.82
+c1-node2 ansible_host=192.168.1.83
+c1-node3 ansible_host=192.168.1.84

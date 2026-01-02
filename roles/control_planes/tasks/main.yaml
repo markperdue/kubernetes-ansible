@@ -33,13 +33,13 @@
   become: true
 
 - name: install pod network
-  shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+  shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/calico.yaml
 
 - name: Add k alias for user
   lineinfile:
-    path=/home/{{ ansible_user }}/.bashrc
+    path=/home/{{ ansible_user | default(ansible_user_id) }}/.bashrc
     line="alias k='kubectl'"
-    owner={{ ansible_user }}
+    owner={{ ansible_user | default(ansible_user_id) }}
     regexp='^alias k='kubectl'$'
     state=present
     insertafter=EOF
